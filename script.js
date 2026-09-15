@@ -1,63 +1,57 @@
 /* ==========================================================
-   GROUP MANAGER V0.2
+GROUP MANAGER V0.2
 ========================================================== */
 
-
 /* ==========================================================
-   STORAGE KEY
+STORAGE KEY
 ========================================================== */
 
 const STORAGE_KEY =
-  "groupManagerV02";
-
-
+"groupManagerV02";
 
 /* ==========================================================
-   DEFAULT USERS
-==========================================================
+DEFAULT USERS
 
-   처음 실행했을 때 Available Users에
-   들어있는 유저가 없습니다.
+처음 실행했을 때 Available Users에
+들어있는 유저가 없습니다.
 
-   사용자가 + 버튼으로 직접 추가합니다.
+사용자가 + 버튼으로 직접 추가합니다.
 ========================================================== */
 
 const DEFAULT_USERS = [];
 
-
-
 /* ==========================================================
-   DEFAULT GROUPS
+DEFAULT GROUPS
 ========================================================== */
 
 const DEFAULT_GROUPS = [
 
-  {
-    id: createId(),
+{
+id: createId(),
 
-    name: "GROUP 1",
+name: "GROUP 1",  
 
-    alliance: "",
+alliance: "",  
 
-    users: []
-  },
+users: []
 
-  {
-    id: createId(),
+},
 
-    name: "GROUP 2",
+{
+id: createId(),
 
-    alliance: "",
+name: "GROUP 2",  
 
-    users: []
-  }
+alliance: "",  
+
+users: []
+
+}
 
 ];
 
-
-
 /* ==========================================================
-   STATE
+STATE
 ========================================================== */
 
 let groups = [];
@@ -65,2370 +59,2186 @@ let groups = [];
 let availableUsers = [];
 
 let dragState = null;
-let touchState = null;
-
-
 
 /* ==========================================================
-   CREATE ID
+CREATE ID
 ========================================================== */
 
 function createId() {
 
-  return (
-    Date.now().toString(36) +
-    Math.random()
-      .toString(36)
-      .substring(2, 8)
-  );
+return (
+Date.now().toString(36) +
+Math.random()
+.toString(36)
+.substring(2, 8)
+);
 
 }
 
-
-
 /* ==========================================================
-   INITIALIZE
+INITIALIZE
 ========================================================== */
 
 function init() {
 
-  const saved =
-    localStorage.getItem(
-      STORAGE_KEY
-    );
+const saved =
+localStorage.getItem(
+STORAGE_KEY
+);
+
+if (saved) {
+
+try {  
+
+  const data =  
+    JSON.parse(saved);  
 
 
-  if (saved) {
-
-    try {
-
-      const data =
-        JSON.parse(saved);
+  groups =  
+    data.groups || [];  
 
 
-      groups =
-        data.groups || [];
+  availableUsers =  
+    data.availableUsers || [];  
 
 
-      availableUsers =
-        data.availableUsers || [];
+} catch {  
 
-
-    } catch {
-
-      loadDefaultState();
-
-    }
-
-  } else {
-
-    loadDefaultState();
-
-  }
-
-
-  render();
+  loadDefaultState();  
 
 }
 
+} else {
 
+loadDefaultState();
+
+}
+
+render();
+
+}
 
 /* ==========================================================
-   DEFAULT STATE
+DEFAULT STATE
 ========================================================== */
 
 function loadDefaultState() {
 
-  groups =
-    DEFAULT_GROUPS.map(
-      group => ({
+groups =
+DEFAULT_GROUPS.map(
+group => ({
 
-        id: createId(),
+id: createId(),  
 
-        name: group.name,
+    name: group.name,  
 
-        alliance: "",
+    alliance: "",  
 
-        users: []
+    users: []  
 
-      })
-    );
+  })  
+);
 
-
-  availableUsers =
-    [...DEFAULT_USERS];
+availableUsers =
+[...DEFAULT_USERS];
 
 }
 
-
-
 /* ==========================================================
-   SAVE
+SAVE
 ========================================================== */
 
 function save() {
 
-  localStorage.setItem(
+localStorage.setItem(
 
-    STORAGE_KEY,
+STORAGE_KEY,  
 
-    JSON.stringify({
+JSON.stringify({  
 
-      groups,
+  groups,  
 
-      availableUsers
+  availableUsers  
 
-    })
+})
 
-  );
+);
 
 }
 
-
-
 /* ==========================================================
-   RENDER
+RENDER
 ========================================================== */
 
 function render() {
 
-  renderGroups();
+renderGroups();
 
-  renderAvailableUsers();
+renderAvailableUsers();
 
-  save();
+save();
 
 }
 
-
-
 /* ==========================================================
-   RENDER GROUPS
+RENDER GROUPS
 ========================================================== */
 
 function renderGroups() {
 
-  const container =
-    document.getElementById(
-      "groupsContainer"
-    );
+const container =
+document.getElementById(
+"groupsContainer"
+);
 
+container.innerHTML = "";
 
-  container.innerHTML = "";
+groups.forEach(
+group => {
 
+const groupBox =  
+    document.createElement(  
+      "div"  
+    );  
 
-  groups.forEach(
-    group => {
 
-      const groupBox =
-        document.createElement(
-          "div"
-        );
+  groupBox.className =  
+    `  
+    bg-white  
+    rounded-xl  
+    border  
+    shadow-sm  
+    overflow-hidden  
+    `;  
 
 
-      groupBox.className =
-        `
-        bg-white
-        rounded-xl
-        border
-        shadow-sm
-        overflow-hidden
-        `;
 
+  /* -----------------------------------------------  
+     HEADER  
+  ------------------------------------------------ */  
 
+  const header =  
+    document.createElement(  
+      "div"  
+    );  
 
-      /* -----------------------------------------------
-         HEADER
-      ------------------------------------------------ */
 
-      const header =
-        document.createElement(
-          "div"
-        );
+  header.className =  
+    `  
+    flex  
+    items-center  
+    justify-between  
+    gap-3  
+    px-4  
+    py-3  
+    bg-gray-50  
+    border-b  
+    `;  
 
 
-      header.className =
-        `
-        flex
-        items-center
-        justify-between
-        gap-3
-        px-4
-        py-3
-        bg-gray-50
-        border-b
-        `;
 
+  /* Left */  
 
+  const left =  
+    document.createElement(  
+      "div"  
+    );  
 
-      /* Left */
 
-      const left =
-        document.createElement(
-          "div"
-        );
+  left.className =  
+    `  
+    flex  
+    items-center  
+    gap-2  
+    min-w-0  
+    `;  
 
 
-      left.className =
-        `
-        flex
-        items-center
-        gap-2
-        min-w-0
-        `;
 
+  /* Group Title */  
 
+  const title =  
+    document.createElement(  
+      "div"  
+    );  
 
-      /* Group Title */
 
-      const title =
-        document.createElement(
-          "div"
-        );
+  title.className =  
+    `  
+    font-bold  
+    text-base  
+    whitespace-nowrap  
+    `;  
 
 
-      title.className =
-        `
-        font-bold
-        text-base
-        whitespace-nowrap
-        `;
+  title.textContent =  
+    `◉ ${group.name}`;  
 
 
-      title.textContent =
-        `◉ ${group.name}`;
 
+  /* Alliance Input */  
 
+  const allianceInput =  
+    document.createElement(  
+      "input"  
+    );  
 
-      /* Alliance Input */
 
-      const allianceInput =
-        document.createElement(
-          "input"
-        );
+  allianceInput.type =  
+    "text";  
 
 
-      allianceInput.type =
-        "text";
+  allianceInput.className =  
+    "group-name-input";  
 
 
-      allianceInput.className =
-        "group-name-input";
+  allianceInput.placeholder =  
+    "YOU";  
 
 
-      allianceInput.placeholder =
-        "YOU";
+  allianceInput.value =  
+    group.alliance || "";  
 
 
-      allianceInput.value =
-        group.alliance || "";
+  allianceInput.setAttribute(  
+    "aria-label",  
+    "Alliance name"  
+  );  
 
 
-      allianceInput.setAttribute(
-        "aria-label",
-        "Alliance name"
-      );
+  allianceInput.addEventListener(  
+    "input",  
+    e => {  
 
+      group.alliance =  
+        e.target.value;  
 
-      allianceInput.addEventListener(
-        "input",
-        e => {
+      save();  
 
-          group.alliance =
-            e.target.value;
+    }  
+  );  
 
-          save();
 
-        }
-      );
+  left.appendChild(  
+    title  
+  );  
 
 
-      left.appendChild(
-        title
-      );
+  left.appendChild(  
+    allianceInput  
+  );  
 
 
-      left.appendChild(
-        allianceInput
-      );
 
+  /* -----------------------------------------------  
+     Right  
+  ------------------------------------------------ */  
 
+  const right =  
+    document.createElement(  
+      "div"  
+    );  
 
-      /* -----------------------------------------------
-         Right
-      ------------------------------------------------ */
 
-      const right =
-        document.createElement(
-          "div"
-        );
+  right.className =  
+    `  
+    flex  
+    items-center  
+    gap-3  
+    `;  
 
 
-      right.className =
-        `
-        flex
-        items-center
-        gap-3
-        `;
 
+  /* User Count */  
 
+  const count =  
+    document.createElement(  
+      "span"  
+    );  
 
-      /* User Count */
 
-      const count =
-        document.createElement(
-          "span"
-        );
+  count.className =  
+    `  
+    text-xs  
+    text-gray-500  
+    font-semibold  
+    whitespace-nowrap  
+    `;  
 
 
-      count.className =
-        `
-        text-xs
-        text-gray-500
-        font-semibold
-        whitespace-nowrap
-        `;
+  count.textContent =  
+    `${group.users.length} users`;  
 
 
-      count.textContent =
-        `${group.users.length} users`;
 
+  /* Delete */  
 
+  const deleteBtn =  
+    document.createElement(  
+      "button"  
+    );  
 
-      /* Delete */
 
-      const deleteBtn =
-        document.createElement(
-          "button"
-        );
+  deleteBtn.className =  
+    `  
+    text-xs  
+    text-red-500  
+    font-semibold  
+    px-2  
+    py-1  
+    rounded  
+    hover:bg-red-50  
+    active:scale-95  
+    `;  
 
 
-      deleteBtn.className =
-        `
-        text-xs
-        text-red-500
-        font-semibold
-        px-2
-        py-1
-        rounded
-        hover:bg-red-50
-        active:scale-95
-        `;
+  deleteBtn.textContent =  
+    "Delete";  
 
 
-      deleteBtn.textContent =
-        "Delete";
+  deleteBtn.addEventListener(  
+    "click",  
+    () =>  
+      deleteGroup(  
+        group.id  
+      )  
+  );  
 
 
-      deleteBtn.addEventListener(
-        "click",
-        () =>
-          deleteGroup(
-            group.id
-          )
-      );
+  right.appendChild(  
+    count  
+  );  
 
 
-      right.appendChild(
-        count
-      );
+  right.appendChild(  
+    deleteBtn  
+  );  
 
 
-      right.appendChild(
-        deleteBtn
-      );
+  header.appendChild(  
+    left  
+  );  
 
 
-      header.appendChild(
-        left
-      );
+  header.appendChild(  
+    right  
+  );  
 
 
-      header.appendChild(
-        right
-      );
 
+  /* -----------------------------------------------  
+     DROP ZONE  
+  ------------------------------------------------ */  
 
+  const dropZone =  
+    document.createElement(  
+      "div"  
+    );  
 
-      /* -----------------------------------------------
-         DROP ZONE
-      ------------------------------------------------ */
 
-      const dropZone =
-        document.createElement(
-          "div"
-        );
+  dropZone.className =  
+    `  
+    group-drop-zone  
+    p-4  
+    min-h-[110px]  
+    flex  
+    flex-wrap  
+    items-start  
+    content-start  
+    gap-2  
+    border-2  
+    border-transparent  
+    `;  
 
 
-      dropZone.className =
-        `
-        group-drop-zone
-        p-4
-        min-h-[110px]
-        flex
-        flex-wrap
-        items-start
-        content-start
-        gap-2
-        border-2
-        border-transparent
-        `;
+  dropZone.dataset.groupId =  
+    group.id;  
 
 
-      dropZone.dataset.groupId =
-        group.id;
 
+  /* Empty */  
 
+  if (  
+    group.users.length === 0  
+  ) {  
 
-      /* Empty */
+    const empty =  
+      document.createElement(  
+        "div"  
+      );  
 
-      if (
-        group.users.length === 0
-      ) {
 
-        const empty =
-          document.createElement(
-            "div"
-          );
+    empty.className =  
+      `  
+      w-full  
+      text-center  
+      text-sm  
+      text-gray-400  
+      py-6  
+      pointer-events-none  
+      `;  
 
 
-        empty.className =
-          `
-          w-full
-          text-center
-          text-sm
-          text-gray-400
-          py-6
-          pointer-events-none
-          `;
+    empty.textContent =  
+      "Drop users here";  
 
 
-        empty.textContent =
-          "Drop users here";
+    dropZone.appendChild(  
+      empty  
+    );  
 
+  }  
 
-        dropZone.appendChild(
-          empty
-        );
 
-      }
 
+  /* Users */  
 
+  group.users.forEach(  
+    user => {  
 
-      /* Users */
+      const chip =  
+        createUserChip(  
+          user,  
+          group.id  
+        );  
 
-      group.users.forEach(
-        user => {
 
-          const chip =
-            createUserChip(
-              user,
-              group.id
-            );
+      dropZone.appendChild(  
+        chip  
+      );  
 
+    }  
+  );  
 
-          dropZone.appendChild(
-            chip
-          );
 
-        }
-      );
 
+  setupGroupDropZone(  
+    dropZone  
+  );  
 
 
-      setupGroupDropZone(
-        dropZone
-      );
+  groupBox.appendChild(  
+    header  
+  );  
 
 
-      groupBox.appendChild(
-        header
-      );
+  groupBox.appendChild(  
+    dropZone  
+  );  
 
 
-      groupBox.appendChild(
-        dropZone
-      );
-
-
-      container.appendChild(
-        groupBox
-      );
-
-    }
-  );
+  container.appendChild(  
+    groupBox  
+  );  
 
 }
 
+);
 
+}
 
 /* ==========================================================
-   RENDER AVAILABLE USERS
+RENDER AVAILABLE USERS
 ========================================================== */
 
 function renderAvailableUsers() {
 
-  const container =
-    document.getElementById(
-      "availableUsers"
-    );
+const container =
+document.getElementById(
+"availableUsers"
+);
+
+container.innerHTML = "";
+
+const count =
+document.getElementById(
+"availableCount"
+);
+
+count.textContent =
+${availableUsers.length} available;
+
+/* -----------------------------------------------
+Existing users
+------------------------------------------------ */
+
+availableUsers.forEach(
+user => {
+
+const chip =  
+    createUserChip(  
+      user,  
+      "available"  
+    );  
 
 
-  container.innerHTML = "";
-
-
-  const count =
-    document.getElementById(
-      "availableCount"
-    );
-
-
-  count.textContent =
-    `${availableUsers.length} available`;
-
-
-
-  /* -----------------------------------------------
-     Existing users
-  ------------------------------------------------ */
-
-  availableUsers.forEach(
-    user => {
-
-      const chip =
-        createUserChip(
-          user,
-          "available"
-        );
-
-
-      container.appendChild(
-        chip
-      );
-
-    }
-  );
-
-
-
-  /* -----------------------------------------------
-     Plus Button
-  ------------------------------------------------ */
-
-  const addButton =
-    document.createElement(
-      "button"
-    );
-
-
-  addButton.className =
-    `
-    w-[42px]
-    h-[38px]
-    rounded-lg
-    border-2
-    border-dashed
-    border-gray-300
-    text-gray-400
-    text-xl
-    font-bold
-    flex
-    items-center
-    justify-center
-    hover:bg-gray-50
-    active:scale-95
-    `;
-
-
-  addButton.textContent =
-    "+";
-
-
-  addButton.title =
-    "Add user";
-
-
-  addButton.addEventListener(
-    "click",
-    showNewUserInput
-  );
-
-
-  container.appendChild(
-    addButton
-  );
+  container.appendChild(  
+    chip  
+  );  
 
 }
 
+);
 
+/* -----------------------------------------------
+Plus Button
+------------------------------------------------ */
+
+const addButton =
+document.createElement(
+"button"
+);
+
+addButton.className =
+  w-[42px]   h-[38px]   rounded-lg   border-2   border-dashed   border-gray-300   text-gray-400   text-xl   font-bold   flex   items-center   justify-center   hover:bg-gray-50   active:scale-95  ;
+
+addButton.textContent =
+"+";
+
+addButton.title =
+"Add user";
+
+addButton.addEventListener(
+"click",
+showNewUserInput
+);
+
+container.appendChild(
+addButton
+);
+
+}
 
 /* ==========================================================
-   CREATE USER CHIP
+CREATE USER CHIP
 ========================================================== */
 
 function createUserChip(
-  user,
-  sourceGroup
+user,
+sourceGroup
 ) {
 
-  const chip =
-    document.createElement(
-      "div"
-    );
-
-
-  chip.className =
-    `
-    user-chip
-    inline-flex
-    items-center
-    px-3
-    py-2
-    rounded-lg
-    border
-    bg-white
-    shadow-sm
-    text-sm
-    font-semibold
-    whitespace-nowrap
-    `;
-
-
-  chip.textContent =
-    user;
-
-
-  chip.dataset.user =
-    user;
-
-
-  chip.dataset.sourceGroup =
-    sourceGroup;
-
-  /* Click = select / deselect */
-
-chip.addEventListener(
-  "click",
-  e => {
-
-    /*
-     * Ignore click after dragging
-     */
-    if (
-      chip.dataset.wasDragged ===
-      "true"
-    ) {
-
-      chip.dataset.wasDragged =
-        "false";
-
-      return;
-
-    }
-
-
-    chip.classList.toggle(
-      "selected"
-    );
-
-  }
+const chip =
+document.createElement(
+"div"
 );
 
+chip.className =
+  user-chip   inline-flex   items-center   px-3   py-2   rounded-lg   border   bg-white   shadow-sm   text-sm   font-semibold   whitespace-nowrap  ;
 
-  /* Mouse */
+chip.textContent =
+user;
 
-  chip.draggable =
-    true;
+chip.dataset.user =
+user;
+
+chip.dataset.sourceGroup =
+sourceGroup;
+
+/* Click = select / deselect */
+
+chip.addEventListener(
+"click",
+e => {
+
+/*  
+ * Ignore click after dragging  
+ */  
+if (  
+  chip.dataset.wasDragged ===  
+  "true"  
+) {  
+
+  chip.dataset.wasDragged =  
+    "false";  
+
+  return;  
+
+}  
 
 
-  chip.addEventListener(
-    "dragstart",
-    mouseDragStart
-  );
+chip.classList.toggle(  
+  "selected"  
+);
 
+}
+);
 
-  chip.addEventListener(
-    "dragend",
-    mouseDragEnd
-  );
+/* Mouse */
 
+chip.draggable =
+true;
 
-  /* Touch */
+chip.addEventListener(
+"dragstart",
+mouseDragStart
+);
 
-  chip.addEventListener(
-    "pointerdown",
-    touchPointerDown
-  );
+chip.addEventListener(
+"dragend",
+mouseDragEnd
+);
 
+/* Touch */
 
-  return chip;
+chip.addEventListener(
+"pointerdown",
+touchPointerDown
+);
+
+return chip;
 
 }
 
-
-
 /* ==========================================================
-   MOUSE DRAG START
+MOUSE DRAG START
 ========================================================== */
 
 function mouseDragStart(e) {
 
-  const chip =
-    e.currentTarget;
+const chip =
+e.currentTarget;
 
 chip.dataset.wasDragged =
-  "true";
-  
-  dragState = {
+"true";
 
-    user:
-      chip.dataset.user,
+dragState = {
 
-    sourceGroup:
-      chip.dataset.sourceGroup
+user:  
+  chip.dataset.user,  
 
-  };
+sourceGroup:  
+  chip.dataset.sourceGroup
 
+};
 
-  chip.classList.add(
-    "dragging"
-  );
+chip.classList.add(
+"dragging"
+);
 
+e.dataTransfer.effectAllowed =
+"move";
 
-  e.dataTransfer.effectAllowed =
-    "move";
-
-
-  e.dataTransfer.setData(
-    "text/plain",
-    chip.dataset.user
-  );
+e.dataTransfer.setData(
+"text/plain",
+chip.dataset.user
+);
 
 }
 
-
-
 /* ==========================================================
-   MOUSE DRAG END
+MOUSE DRAG END
 ========================================================== */
 
 function mouseDragEnd(e) {
 
-  e.currentTarget.classList.remove(
-    "dragging"
-  );
+e.currentTarget.classList.remove(
+"dragging"
+);
 
+clearDropHighlights();
 
-  clearDropHighlights();
-
-
-  dragState =
-    null;
+dragState =
+null;
 
 }
 
-
-
 /* ==========================================================
-   GROUP DROP ZONE
+GROUP DROP ZONE
 ========================================================== */
 
 function setupGroupDropZone(
-  zone
+zone
 ) {
 
+zone.addEventListener(
+"dragover",
+e => {
 
-  zone.addEventListener(
-    "dragover",
-    e => {
-
-      e.preventDefault();
-
-
-      zone.classList.add(
-        "drag-over"
-      );
+e.preventDefault();  
 
 
-      updateDropIndicator(
-        zone,
-        e.clientX,
-        e.clientY
-      );
-
-    }
-  );
+  zone.classList.add(  
+    "drag-over"  
+  );  
 
 
-
-  zone.addEventListener(
-    "dragleave",
-    e => {
-
-      if (
-        !zone.contains(
-          e.relatedTarget
-        )
-      ) {
-
-        zone.classList.remove(
-          "drag-over"
-        );
-
-        removeDropIndicator(
-          zone
-        );
-
-      }
-
-    }
-  );
-
-
-
-  zone.addEventListener(
-    "drop",
-    e => {
-
-      e.preventDefault();
-
-
-      zone.classList.remove(
-        "drag-over"
-      );
-
-
-      const user =
-        e.dataTransfer.getData(
-          "text/plain"
-        );
-
-
-      if (!user)
-        return;
-
-
-      const index =
-        getInsertIndex(
-          zone,
-          e.clientX,
-          e.clientY
-        );
-
-
-      moveUserToGroup(
-        user,
-        zone.dataset.groupId,
-        index
-      );
-
-
-      removeDropIndicator(
-        zone
-      );
-
-    }
-  );
+  updateDropIndicator(  
+    zone,  
+    e.clientX,  
+    e.clientY  
+  );  
 
 }
 
+);
 
+zone.addEventListener(
+"dragleave",
+e => {
+
+if (  
+    !zone.contains(  
+      e.relatedTarget  
+    )  
+  ) {  
+
+    zone.classList.remove(  
+      "drag-over"  
+    );  
+
+    removeDropIndicator(  
+      zone  
+    );  
+
+  }  
+
+}
+
+);
+
+zone.addEventListener(
+"drop",
+e => {
+
+e.preventDefault();  
+
+
+  zone.classList.remove(  
+    "drag-over"  
+  );  
+
+
+  const user =  
+    e.dataTransfer.getData(  
+      "text/plain"  
+    );  
+
+
+  if (!user)  
+    return;  
+
+
+  const index =  
+    getInsertIndex(  
+      zone,  
+      e.clientX,  
+      e.clientY  
+    );  
+
+
+  moveUserToGroup(  
+    user,  
+    zone.dataset.groupId,  
+    index  
+  );  
+
+
+  removeDropIndicator(  
+    zone  
+  );  
+
+}
+
+);
+
+}
 
 /* ==========================================================
-   AVAILABLE USERS DROP ZONE
+AVAILABLE USERS DROP ZONE
 ========================================================== */
 
 function setupAvailableDropZone() {
 
-  const zone =
-    document.getElementById(
-      "availableUsers"
-    );
+const zone =
+document.getElementById(
+"availableUsers"
+);
+
+zone.addEventListener(
+"dragover",
+e => {
+
+e.preventDefault();  
 
 
-  zone.addEventListener(
-    "dragover",
-    e => {
-
-      e.preventDefault();
-
-
-      zone.classList.add(
-        "drag-over"
-      );
-
-    }
-  );
-
-
-  zone.addEventListener(
-    "dragleave",
-    e => {
-
-      if (
-        !zone.contains(
-          e.relatedTarget
-        )
-      ) {
-
-        zone.classList.remove(
-          "drag-over"
-        );
-
-      }
-
-    }
-  );
-
-
-  zone.addEventListener(
-    "drop",
-    e => {
-
-      e.preventDefault();
-
-
-      zone.classList.remove(
-        "drag-over"
-      );
-
-
-      const user =
-        e.dataTransfer.getData(
-          "text/plain"
-        );
-
-
-      if (!user)
-        return;
-
-
-      returnUserToAvailable(
-        user
-      );
-
-    }
-  );
+  zone.classList.add(  
+    "drag-over"  
+  );  
 
 }
 
+);
 
+zone.addEventListener(
+"dragleave",
+e => {
+
+if (  
+    !zone.contains(  
+      e.relatedTarget  
+    )  
+  ) {  
+
+    zone.classList.remove(  
+      "drag-over"  
+    );  
+
+  }  
+
+}
+
+);
+
+zone.addEventListener(
+"drop",
+e => {
+
+e.preventDefault();  
+
+
+  zone.classList.remove(  
+    "drag-over"  
+  );  
+
+
+  const user =  
+    e.dataTransfer.getData(  
+      "text/plain"  
+    );  
+
+
+  if (!user)  
+    return;  
+
+
+  returnUserToAvailable(  
+    user  
+  );  
+
+}
+
+);
+
+}
 
 /* ==========================================================
-   DELETE DROP ZONE
+DELETE DROP ZONE
 ========================================================== */
 
 function setupDeleteDropZone() {
 
-  const zone =
-    document.getElementById(
-      "availableDeleteZone"
-    );
+const zone =
+document.getElementById(
+"availableDeleteZone"
+);
+
+zone.addEventListener(
+"dragover",
+e => {
+
+/*  
+   * Only allow delete if  
+   * source is Available Users.  
+   */  
+
+  if (  
+    dragState?.sourceGroup !==  
+    "available"  
+  ) {  
+
+    return;  
+
+  }  
 
 
-  zone.addEventListener(
-    "dragover",
-    e => {
-
-      /*
-       * Only allow delete if
-       * source is Available Users.
-       */
-
-      if (
-        dragState?.sourceGroup !==
-        "available"
-      ) {
-
-        return;
-
-      }
+  e.preventDefault();  
 
 
-      e.preventDefault();
-
-
-      zone.classList.add(
-        "drag-over"
-      );
-
-    }
-  );
-
-
-  zone.addEventListener(
-    "dragleave",
-    () => {
-
-      zone.classList.remove(
-        "drag-over"
-      );
-
-    }
-  );
-
-
-  zone.addEventListener(
-    "drop",
-    e => {
-
-      e.preventDefault();
-
-
-      zone.classList.remove(
-        "drag-over"
-      );
-
-
-      if (
-        dragState?.sourceGroup !==
-        "available"
-      ) {
-
-        return;
-
-      }
-
-
-      const user =
-        e.dataTransfer.getData(
-          "text/plain"
-        );
-
-
-      if (!user)
-        return;
-
-
-      deleteAvailableUser(
-        user
-      );
-
-    }
-  );
+  zone.classList.add(  
+    "drag-over"  
+  );  
 
 }
 
+);
 
+zone.addEventListener(
+"dragleave",
+() => {
+
+zone.classList.remove(  
+    "drag-over"  
+  );  
+
+}
+
+);
+
+zone.addEventListener(
+"drop",
+e => {
+
+e.preventDefault();  
+
+
+  zone.classList.remove(  
+    "drag-over"  
+  );  
+
+
+  if (  
+    dragState?.sourceGroup !==  
+    "available"  
+  ) {  
+
+    return;  
+
+  }  
+
+
+  const user =  
+    e.dataTransfer.getData(  
+      "text/plain"  
+    );  
+
+
+  if (!user)  
+    return;  
+
+
+  deleteAvailableUser(  
+    user  
+  );  
+
+}
+
+);
+
+}
 
 /* ==========================================================
-   MOVE USER TO GROUP
+MOVE USER TO GROUP
 ========================================================== */
 
 function moveUserToGroup(
-  user,
-  targetGroupId,
-  insertIndex
+user,
+targetGroupId,
+insertIndex
 ) {
 
+/* -----------------------------------------------
+Remove from Available
+------------------------------------------------ */
 
-  /* -----------------------------------------------
-     Remove from Available
-  ------------------------------------------------ */
+availableUsers =
+availableUsers.filter(
+item =>
+item !== user
+);
 
-  availableUsers =
-    availableUsers.filter(
-      item =>
-        item !== user
-    );
+/* -----------------------------------------------
+Remove from every group
+------------------------------------------------ */
 
+groups.forEach(
+group => {
 
-  /* -----------------------------------------------
-     Remove from every group
-  ------------------------------------------------ */
-
-  groups.forEach(
-    group => {
-
-      group.users =
-        group.users.filter(
-          item =>
-            item !== user
-        );
-
-    }
-  );
-
-
-  /* -----------------------------------------------
-     Target group
-  ------------------------------------------------ */
-
-  const targetGroup =
-    groups.find(
-      group =>
-        group.id ===
-        targetGroupId
-    );
-
-
-  if (!targetGroup) {
-
-    render();
-
-    return;
-
-  }
-
-
-  insertIndex =
-    Math.max(
-      0,
-      Math.min(
-        insertIndex ?? targetGroup.users.length,
-        targetGroup.users.length
-      )
-    );
-
-
-  targetGroup.users.splice(
-    insertIndex,
-    0,
-    user
-  );
-
-
-  render();
+group.users =  
+    group.users.filter(  
+      item =>  
+        item !== user  
+    );  
 
 }
 
+);
 
+/* -----------------------------------------------
+Target group
+------------------------------------------------ */
+
+const targetGroup =
+groups.find(
+group =>
+group.id ===
+targetGroupId
+);
+
+if (!targetGroup) {
+
+render();  
+
+return;
+
+}
+
+insertIndex =
+Math.max(
+0,
+Math.min(
+insertIndex ?? targetGroup.users.length,
+targetGroup.users.length
+)
+);
+
+targetGroup.users.splice(
+insertIndex,
+0,
+user
+);
+
+render();
+
+}
 
 /* ==========================================================
-   RETURN TO AVAILABLE
+RETURN TO AVAILABLE
 ========================================================== */
 
 function returnUserToAvailable(
-  user
+user
 ) {
 
+/* -----------------------------------------------
+Remove from groups
+------------------------------------------------ */
 
-  /* -----------------------------------------------
-     Remove from groups
-  ------------------------------------------------ */
+groups.forEach(
+group => {
 
-  groups.forEach(
-    group => {
-
-      group.users =
-        group.users.filter(
-          item =>
-            item !== user
-        );
-
-    }
-  );
-
-
-  /* -----------------------------------------------
-     Prevent duplicate
-  ------------------------------------------------ */
-
-  if (
-    !availableUsers.includes(
-      user
-    )
-  ) {
-
-    availableUsers.push(
-      user
-    );
-
-  }
-
-
-  render();
+group.users =  
+    group.users.filter(  
+      item =>  
+        item !== user  
+    );  
 
 }
 
+);
 
+/* -----------------------------------------------
+Prevent duplicate
+------------------------------------------------ */
+
+if (
+!availableUsers.includes(
+user
+)
+) {
+
+availableUsers.push(  
+  user  
+);
+
+}
+
+render();
+
+}
 
 /* ==========================================================
-   DELETE AVAILABLE USER
+DELETE AVAILABLE USER
 ========================================================== */
 
 function deleteAvailableUser(
-  user
+user
 ) {
 
-  availableUsers =
-    availableUsers.filter(
-      item =>
-        item !== user
-    );
+availableUsers =
+availableUsers.filter(
+item =>
+item !== user
+);
 
-
-  render();
+render();
 
 }
 
-
-
 /* ==========================================================
-   INSERT INDEX
+INSERT INDEX
 ========================================================== */
 
 function getInsertIndex(
-  zone,
-  x,
-  y
+zone,
+x,
+y
 ) {
 
-  const chips = [
-    ...zone.querySelectorAll(
-      ".user-chip:not(.dragging)"
-    )
-  ];
+const chips = [
+...zone.querySelectorAll(
+".user-chip:not(.dragging)"
+)
+];
 
+if (
+chips.length === 0
+) {
 
-  if (
-    chips.length === 0
-  ) {
-
-    return 0;
-
-  }
-
-
-  let closestIndex =
-    chips.length;
-
-
-  let closestDistance =
-    Infinity;
-
-
-  chips.forEach(
-    (chip, index) => {
-
-      const rect =
-        chip.getBoundingClientRect();
-
-
-      const centerX =
-        rect.left +
-        rect.width / 2;
-
-
-      const centerY =
-        rect.top +
-        rect.height / 2;
-
-
-      let distance;
-
-
-      if (
-        y >= rect.top &&
-        y <= rect.bottom
-      ) {
-
-        distance =
-          Math.abs(
-            x - centerX
-          );
-
-      } else {
-
-        distance =
-          Math.sqrt(
-            Math.pow(
-              x - centerX,
-              2
-            ) +
-            Math.pow(
-              y - centerY,
-              2
-            )
-          );
-
-      }
-
-
-      if (
-        distance <
-        closestDistance
-      ) {
-
-        closestDistance =
-          distance;
-
-
-        closestIndex =
-          x < centerX
-            ? index
-            : index + 1;
-
-      }
-
-    }
-  );
-
-
-  return closestIndex;
+return 0;
 
 }
 
+let closestIndex =
+chips.length;
 
+let closestDistance =
+Infinity;
+
+chips.forEach(
+(chip, index) => {
+
+const rect =  
+    chip.getBoundingClientRect();  
+
+
+  const centerX =  
+    rect.left +  
+    rect.width / 2;  
+
+
+  const centerY =  
+    rect.top +  
+    rect.height / 2;  
+
+
+  let distance;  
+
+
+  if (  
+    y >= rect.top &&  
+    y <= rect.bottom  
+  ) {  
+
+    distance =  
+      Math.abs(  
+        x - centerX  
+      );  
+
+  } else {  
+
+    distance =  
+      Math.sqrt(  
+        Math.pow(  
+          x - centerX,  
+          2  
+        ) +  
+        Math.pow(  
+          y - centerY,  
+          2  
+        )  
+      );  
+
+  }  
+
+
+  if (  
+    distance <  
+    closestDistance  
+  ) {  
+
+    closestDistance =  
+      distance;  
+
+
+    closestIndex =  
+      x < centerX  
+        ? index  
+        : index + 1;  
+
+  }  
+
+}
+
+);
+
+return closestIndex;
+
+}
 
 /* ==========================================================
-   DROP INDICATOR
+DROP INDICATOR
 ========================================================== */
 
 function updateDropIndicator(
-  zone,
-  x,
-  y
+zone,
+x,
+y
 ) {
 
-  removeDropIndicator(
-    zone
-  );
+removeDropIndicator(
+zone
+);
 
+const chips = [
+...zone.querySelectorAll(
+".user-chip:not(.dragging)"
+)
+];
 
-  const chips = [
-    ...zone.querySelectorAll(
-      ".user-chip:not(.dragging)"
-    )
-  ];
+if (
+chips.length === 0
+) {
 
-
-  if (
-    chips.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  const index =
-    getInsertIndex(
-      zone,
-      x,
-      y
-    );
-
-
-  const indicator =
-    document.createElement(
-      "div"
-    );
-
-
-  indicator.className =
-    "drop-indicator";
-
-
-  indicator.dataset.dropIndicator =
-    "true";
-
-
-  if (
-    index >= chips.length
-  ) {
-
-    zone.appendChild(
-      indicator
-    );
-
-  } else {
-
-    zone.insertBefore(
-      indicator,
-      chips[index]
-    );
-
-  }
+return;
 
 }
 
+const index =
+getInsertIndex(
+zone,
+x,
+y
+);
 
+const indicator =
+document.createElement(
+"div"
+);
+
+indicator.className =
+"drop-indicator";
+
+indicator.dataset.dropIndicator =
+"true";
+
+if (
+index >= chips.length
+) {
+
+zone.appendChild(  
+  indicator  
+);
+
+} else {
+
+zone.insertBefore(  
+  indicator,  
+  chips[index]  
+);
+
+}
+
+}
 
 function removeDropIndicator(
-  zone
+zone
 ) {
 
-  const indicator =
-    zone.querySelector(
-      "[data-drop-indicator]"
-    );
+const indicator =
+zone.querySelector(
+"[data-drop-indicator]"
+);
 
+if (indicator) {
 
-  if (indicator) {
-
-    indicator.remove();
-
-  }
+indicator.remove();
 
 }
 
-
+}
 
 /* ==========================================================
-   CLEAR DROP HIGHLIGHTS
+CLEAR DROP HIGHLIGHTS
 ========================================================== */
 
 function clearDropHighlights() {
 
-  document
-    .querySelectorAll(
-      ".drag-over"
-    )
-    .forEach(
-      element => {
+document
+.querySelectorAll(
+".drag-over"
+)
+.forEach(
+element => {
 
-        element.classList.remove(
-          "drag-over"
-        );
+element.classList.remove(  
+      "drag-over"  
+    );  
 
-      }
-    );
+  }  
+);
 
+document
+.querySelectorAll(
+"[data-drop-indicator]"
+)
+.forEach(
+element => {
 
-  document
-    .querySelectorAll(
-      "[data-drop-indicator]"
-    )
-    .forEach(
-      element => {
+element.remove();  
 
-        element.remove();
-
-      }
-    );
+  }  
+);
 
 }
 
-
-
 /* ==========================================================
-   TOUCH DRAG START
+TOUCH DRAG START
 ========================================================== */
 
+function touchPointerDown(e) {
 
-  
-  function touchPointerDown(e) {
-  if (e.pointerType === "mouse") {
-    return;
-  }
+if (
+e.pointerType === "mouse"
+) {
 
-  const chip = e.currentTarget;
+return;
 
-  touchState = {
-    chip,
-    pointerId: e.pointerId,
-    startX: e.clientX,
-    startY: e.clientY,
-    dragging: false,
-    preview: null
-  };
-
-  /*
-   * Keep receiving pointer events even
-   * when the finger moves outside the chip.
-   */
-  chip.setPointerCapture(e.pointerId);
-
-  chip.addEventListener(
-    "pointermove",
-    touchPointerMove
-  );
-
-  chip.addEventListener(
-    "pointerup",
-    touchPointerUp
-  );
-
-  chip.addEventListener(
-    "pointercancel",
-    touchPointerUp
-  );
 }
 
+const chip =
+e.currentTarget;
 
-function touchPointerMove(e) {
-  if (
-    !touchState ||
-    e.pointerId !== touchState.pointerId
-  ) {
-    return;
-  }
+chip.dataset.wasDragged =
+"true";
 
-  const chip = touchState.chip;
+const rect =
+chip.getBoundingClientRect();
 
-  /*
-   * Not dragging yet:
-   * check whether the finger actually moved.
-   */
-  if (!touchState.dragging) {
-    const dx =
-      e.clientX - touchState.startX;
+const preview =
+chip.cloneNode(true);
 
-    const dy =
-      e.clientY - touchState.startY;
+preview.classList.remove(
+"user-chip"
+);
 
-    const distance =
-      Math.sqrt(dx * dx + dy * dy);
+preview.classList.add(
+"drag-preview"
+);
 
-    /*
-     * Small movement = still a tap.
-     * Start drag only after 8px movement.
-     */
-    if (distance < 8) {
-      return;
-    }
+preview.style.width =
+${rect.width}px;
 
-    /*
-     * Real drag starts here.
-     */
-    touchState.dragging = true;
+preview.style.left =
+${e.clientX}px;
 
-    chip.dataset.wasDragged = "true";
+preview.style.top =
+${e.clientY}px;
 
-    const rect =
-      chip.getBoundingClientRect();
+document.body.appendChild(
+preview
+);
 
-    const preview =
-      chip.cloneNode(true);
+chip.classList.add(
+"dragging"
+);
 
-    preview.classList.remove(
-      "user-chip"
-    );
+chip.setPointerCapture(
+e.pointerId
+);
 
-    preview.classList.add(
-      "drag-preview"
-    );
+dragState = {
 
-    preview.style.position = "fixed";
-    preview.style.left = `${rect.left}px`;
-    preview.style.top = `${rect.top}px`;
-    preview.style.width = `${rect.width}px`;
-    preview.style.pointerEvents = "none";
-    preview.style.zIndex = "9999";
+user:  
+  chip.dataset.user,  
 
-    document.body.appendChild(preview);
+sourceGroup:  
+  chip.dataset.sourceGroup,  
 
-    touchState.preview = preview;
+chip,  
 
-    chip.classList.add("dragging");
+preview,  
 
-    dragState = {
-      user: chip.dataset.user,
-      sourceGroup:
-        chip.dataset.sourceGroup,
-      chip,
-      preview,
-      pointerId: e.pointerId
-    };
-  }
+pointerId:  
+  e.pointerId
 
-  /*
-   * Prevent scrolling once an actual drag has started.
-   */
-  e.preventDefault();
+};
 
-  const preview =
-    touchState.preview;
+chip.addEventListener(
+"pointermove",
+touchPointerMove
+);
 
-  if (preview) {
-    preview.style.left =
-      `${e.clientX - preview.offsetWidth / 2}px`;
+chip.addEventListener(
+"pointerup",
+touchPointerUp
+);
 
-    preview.style.top =
-      `${e.clientY - preview.offsetHeight / 2}px`;
-  }
+chip.addEventListener(
+"pointercancel",
+touchPointerUp
+);
 
-  /*
-   * Temporarily hide preview to detect
-   * the element underneath the finger.
-   */
-  if (preview) {
-    preview.style.display = "none";
-  }
-
-  const target =
-    document.elementFromPoint(
-      e.clientX,
-      e.clientY
-    );
-
-  if (preview) {
-    preview.style.display = "";
-  }
-
-  clearDropHighlights();
-
-  if (!target) {
-    return;
-  }
-
-  const groupZone =
-    target.closest("[data-group-id]");
-
-  if (groupZone) {
-    groupZone.classList.add(
-      "drag-over"
-    );
-    return;
-  }
-
-  const availableZone =
-    target.closest("#availableUsers");
-
-  if (availableZone) {
-    availableZone.classList.add(
-      "drag-over"
-    );
-    return;
-  }
-
-  const deleteZone =
-    target.closest("#deleteZone");
-
-  if (
-    deleteZone &&
-    dragState.sourceGroup ===
-      "available"
-  ) {
-    deleteZone.classList.add(
-      "drag-over"
-    );
-  }
 }
-
-
-function touchPointerUp(e) {
-  if (
-    !touchState ||
-    e.pointerId !== touchState.pointerId
-  ) {
-    return;
-  }
-
-  const state = touchState;
-  const chip = state.chip;
-
-  /*
-   * Simple tap:
-   * do nothing here.
-   * The normal "click" event will
-   * select / deselect the chip.
-   */
-  if (!state.dragging) {
-    try {
-      chip.releasePointerCapture(
-        e.pointerId
-      );
-    } catch {}
-
-    chip.removeEventListener(
-      "pointermove",
-      touchPointerMove
-    );
-
-    chip.removeEventListener(
-      "pointerup",
-      touchPointerUp
-    );
-
-    chip.removeEventListener(
-      "pointercancel",
-      touchPointerUp
-    );
-
-    touchState = null;
-
-    return;
-  }
-
-  /*
-   * Actual drag:
-   * determine where the user dropped.
-   */
-  const preview = state.preview;
-
-  if (preview) {
-    preview.style.display = "none";
-  }
-
-  const target =
-    document.elementFromPoint(
-      e.clientX,
-      e.clientY
-    );
-
-  if (preview) {
-    preview.remove();
-  }
-
-  clearDropHighlights();
-
-  if (target && dragState) {
-    const groupZone =
-      target.closest(
-        "[data-group-id]"
-      );
-
-    if (groupZone) {
-      const groupId =
-        groupZone.dataset.groupId;
-
-      const insertIndex =
-        getInsertIndex(
-          groupZone,
-          e.clientY
-        );
-
-      moveUserToGroup(
-        dragState.user,
-        groupId,
-        insertIndex
-      );
-    } else {
-      const availableZone =
-        target.closest(
-          "#availableUsers"
-        );
-
-      if (availableZone) {
-        returnUserToAvailable(
-          dragState.user
-        );
-      } else {
-        const deleteZone =
-          target.closest(
-            "#deleteZone"
-          );
-
-        if (
-          deleteZone &&
-          dragState.sourceGroup ===
-            "available"
-        ) {
-          deleteAvailableUser(
-            dragState.user
-          );
-        }
-      }
-    }
-  }
-
-  chip.classList.remove(
-    "dragging"
-  );
-
-  try {
-    chip.releasePointerCapture(
-      e.pointerId
-    );
-  } catch {}
-
-  chip.removeEventListener(
-    "pointermove",
-    touchPointerMove
-  );
-
-  chip.removeEventListener(
-    "pointerup",
-    touchPointerUp
-  );
-
-  chip.removeEventListener(
-    "pointercancel",
-    touchPointerUp
-  );
-
-  dragState = null;
-  touchState = null;
-}
-
 
 /* ==========================================================
-   ADD GROUP
+TOUCH DRAG MOVE
+========================================================== */
+
+function touchPointerMove(e) {
+
+if (
+!dragState ||
+dragState.pointerId !==
+e.pointerId
+) {
+
+return;
+
+}
+
+const {
+preview
+} = dragState;
+
+preview.style.left =
+${e.clientX}px;
+
+preview.style.top =
+${e.clientY}px;
+
+preview.style.display =
+"none";
+
+const target =
+document.elementFromPoint(
+e.clientX,
+e.clientY
+);
+
+preview.style.display =
+"";
+
+clearDropHighlights();
+
+/* Group */
+
+const groupZone =
+target?.closest(
+".group-drop-zone"
+);
+
+if (groupZone) {
+
+groupZone.classList.add(  
+  "drag-over"  
+);  
+
+
+updateDropIndicator(  
+  groupZone,  
+  e.clientX,  
+  e.clientY  
+);  
+
+
+return;
+
+}
+
+/* Available */
+
+const availableZone =
+target?.closest(
+"#availableUsers"
+);
+
+if (availableZone) {
+
+availableZone.classList.add(  
+  "drag-over"  
+);  
+
+return;
+
+}
+
+/* Delete */
+
+const deleteZone =
+target?.closest(
+"#availableDeleteZone"
+);
+
+if (deleteZone) {
+
+/*  
+ * Delete highlight only when  
+ * dragging an Available User.  
+ */  
+
+if (  
+  dragState.sourceGroup ===  
+  "available"  
+) {  
+
+  deleteZone.classList.add(  
+    "drag-over"  
+  );  
+
+}
+
+}
+
+}
+
+/* ==========================================================
+TOUCH DRAG END
+========================================================== */
+
+function touchPointerUp(e) {
+
+if (
+!dragState ||
+dragState.pointerId !==
+e.pointerId
+) {
+
+return;
+
+}
+
+const {
+chip,
+preview,
+user,
+sourceGroup
+} = dragState;
+
+preview.style.display =
+"none";
+
+const target =
+document.elementFromPoint(
+e.clientX,
+e.clientY
+);
+
+/* -----------------------------------------------
+Group
+------------------------------------------------ */
+
+const groupZone =
+target?.closest(
+".group-drop-zone"
+);
+
+if (groupZone) {
+
+const index =  
+  getInsertIndex(  
+    groupZone,  
+    e.clientX,  
+    e.clientY  
+  );  
+
+
+moveUserToGroup(  
+  user,  
+  groupZone.dataset.groupId,  
+  index  
+);
+
+}
+
+/* -----------------------------------------------
+Available
+------------------------------------------------ */
+
+else if (
+target?.closest(
+"#availableUsers"
+)
+) {
+
+returnUserToAvailable(  
+  user  
+);
+
+}
+
+/* -----------------------------------------------
+Delete
+------------------------------------------------ */
+
+else if (
+target?.closest(
+"#availableDeleteZone"
+)
+) {
+
+if (  
+  sourceGroup ===  
+  "available"  
+) {  
+
+  deleteAvailableUser(  
+    user  
+  );  
+
+}
+
+}
+
+chip.classList.remove(
+"dragging"
+);
+
+preview.remove();
+
+clearDropHighlights();
+
+try {
+
+chip.releasePointerCapture(  
+  e.pointerId  
+);
+
+} catch {}
+
+chip.removeEventListener(
+"pointermove",
+touchPointerMove
+);
+
+chip.removeEventListener(
+"pointerup",
+touchPointerUp
+);
+
+chip.removeEventListener(
+"pointercancel",
+touchPointerUp
+);
+
+dragState =
+null;
+
+}
+
+/* ==========================================================
+ADD GROUP
 ========================================================== */
 
 document
-  .getElementById(
-    "addGroupBtn"
-  )
-  .addEventListener(
-    "click",
-    addGroup
-  );
-
-
+.getElementById(
+"addGroupBtn"
+)
+.addEventListener(
+"click",
+addGroup
+);
 
 function addGroup() {
 
-  const groupNumber =
-    getNextGroupNumber();
+const groupNumber =
+getNextGroupNumber();
 
+groups.push({
 
-  groups.push({
+id:  
+  createId(),  
 
-    id:
-      createId(),
+name:  
+  `GROUP ${groupNumber}`,  
 
-    name:
-      `GROUP ${groupNumber}`,
+alliance:  
+  "",  
 
-    alliance:
-      "",
+users:  
+  []
 
-    users:
-      []
+});
 
-  });
-
-
-  render();
+render();
 
 }
 
-
-
 /* ==========================================================
-   NEXT GROUP NUMBER
+NEXT GROUP NUMBER
 ========================================================== */
 
 function getNextGroupNumber() {
 
-  let number = 1;
+let number = 1;
 
+while (
+groups.some(
+group =>
+group.name ===
+GROUP ${number}
+)
+) {
 
-  while (
-    groups.some(
-      group =>
-        group.name ===
-        `GROUP ${number}`
-    )
-  ) {
-
-    number++;
-
-  }
-
-
-  return number;
+number++;
 
 }
 
+return number;
 
+}
 
 /* ==========================================================
-   DELETE GROUP
+DELETE GROUP
 ========================================================== */
 
 function deleteGroup(
-  groupId
+groupId
 ) {
 
-  const group =
-    groups.find(
-      item =>
-        item.id ===
-        groupId
-    );
+const group =
+groups.find(
+item =>
+item.id ===
+groupId
+);
+
+if (!group)
+return;
+
+if (
+group.users.length > 0
+) {
+
+const confirmed =  
+  confirm(  
+    `${group.name} contains ${group.users.length} users.\n\nDelete the group and move the users to Available Users?`  
+  );  
 
 
-  if (!group)
-    return;
+if (!confirmed)  
+  return;  
 
 
-  if (
-    group.users.length > 0
-  ) {
+group.users.forEach(  
+  user => {  
 
-    const confirmed =
-      confirm(
-        `${group.name} contains ${group.users.length} users.\n\nDelete the group and move the users to Available Users?`
-      );
+    if (  
+      !availableUsers.includes(  
+        user  
+      )  
+    ) {  
 
+      availableUsers.push(  
+        user  
+      );  
 
-    if (!confirmed)
-      return;
+    }  
 
-
-    group.users.forEach(
-      user => {
-
-        if (
-          !availableUsers.includes(
-            user
-          )
-        ) {
-
-          availableUsers.push(
-            user
-          );
-
-        }
-
-      }
-    );
-
-  }
-
-
-  groups =
-    groups.filter(
-      item =>
-        item.id !==
-        groupId
-    );
-
-
-  render();
+  }  
+);
 
 }
 
+groups =
+groups.filter(
+item =>
+item.id !==
+groupId
+);
 
+render();
+
+}
 
 /* ==========================================================
-   SHOW NEW USER INPUT
+SHOW NEW USER INPUT
 ========================================================== */
 
 function showNewUserInput() {
 
-  const container =
-    document.getElementById(
-      "availableUsers"
-    );
+const container =
+document.getElementById(
+"availableUsers"
+);
+
+/*
+
+Prevent multiple input boxes
+*/
 
 
-  /*
-   * Prevent multiple input boxes
-   */
+if (
+container.querySelector(
+".new-user-input"
+)
+) {
 
-  if (
-    container.querySelector(
-      ".new-user-input"
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const input =
-    document.createElement(
-      "input"
-    );
-
-  
-  input.className =
-    "new-user-input";
-
-
-  input.placeholder =
-    "User name";
-
-
-  input.autocomplete =
-    "off";
-
-
-  /*
-   * Put input before +
-   */
-
-  const plusButton =
-    container.querySelector(
-      "button"
-    );
-
-
-  container.insertBefore(
-    input,
-    plusButton
-  );
-
-
-  input.focus();
-
-
-
-  /* -----------------------------------------------
-     Enter
-  ------------------------------------------------ */
-
-  input.addEventListener(
-    "keydown",
-    e => {
-
-      if (
-        e.key ===
-        "Enter"
-      ) {
-        
-        e.preventDefault();
-        addNewUser(
-          input.value
-        );
-
-      }
-
-
-      if (
-        e.key ===
-        "Escape"
-      ) {
-
-        render();
-
-      }
-
-    }
-  );
-
-
-
-  /* -----------------------------------------------
-     Blur
-  ------------------------------------------------ */
-
-  input.addEventListener(
-    "blur",
-    () => {
-
-      if (
-        input.value.trim()
-      ) {
-
-        addNewUser(
-          input.value
-        );
-
-      } else {
-
-        render();
-
-      }
-
-    }
-  );
+return;
 
 }
 
+const input =
+document.createElement(
+"input"
+);
 
+input.className =
+"new-user-input";
+
+input.placeholder =
+"User name";
+
+input.autocomplete =
+"off";
+
+/*
+
+Put input before +
+*/
+
+
+const plusButton =
+container.querySelector(
+"button"
+);
+
+container.insertBefore(
+input,
+plusButton
+);
+
+input.focus();
+
+/* -----------------------------------------------
+Enter
+------------------------------------------------ */
+
+input.addEventListener(
+"keydown",
+e => {
+
+if (  
+    e.key ===  
+    "Enter"  
+  ) {  
+      
+    e.preventDefault();  
+    addNewUser(  
+      input.value  
+    );  
+
+  }  
+
+
+  if (  
+    e.key ===  
+    "Escape"  
+  ) {  
+
+    render();  
+
+  }  
+
+}
+
+);
+
+/* -----------------------------------------------
+Blur
+------------------------------------------------ */
+
+input.addEventListener(
+"blur",
+() => {
+
+if (  
+    input.value.trim()  
+  ) {  
+
+    addNewUser(  
+      input.value  
+    );  
+
+  } else {  
+
+    render();  
+
+  }  
+
+}
+
+);
+
+}
 
 /* ==========================================================
-   ADD NEW USER
+ADD NEW USER
 ========================================================== */
 
 function addNewUser(
-  name
+name
 ) {
 
-  name =
-    name.trim();
+name =
+name.trim();
 
+if (!name) {
 
-  if (!name) {
+render();  
 
-    render();
-
-    return;
-
-  }
-
-
-  /*
-   * Prevent duplicate
-   */
-
-  const exists =
-    availableUsers.includes(
-      name
-    );
-
-
-  const inGroup =
-    groups.some(
-      group =>
-        group.users.includes(
-          name
-        )
-    );
-
-
-  if (
-    exists ||
-    inGroup
-  ) {
-
-    alert(
-      "This user already exists."
-    );
-
-    render();
-
-    return;
-
-  }
-
-
-  availableUsers.push(
-    name
-  );
-
-
-  render();
+return;
 
 }
 
+/*
 
+Prevent duplicate
+*/
+
+
+const exists =
+availableUsers.includes(
+name
+);
+
+const inGroup =
+groups.some(
+group =>
+group.users.includes(
+name
+)
+);
+
+if (
+exists ||
+inGroup
+) {
+
+alert(  
+  "This user already exists."  
+);  
+
+render();  
+
+return;
+
+}
+
+availableUsers.push(
+name
+);
+
+render();
+
+}
 
 /* ==========================================================
-   COPY
+COPY
 ========================================================== */
 
 document
-  .getElementById(
-    "copyBtn"
-  )
-  .addEventListener(
-    "click",
-    copyGroups
+.getElementById(
+"copyBtn"
+)
+.addEventListener(
+"click",
+copyGroups
+);
+
+function copyGroups() {
+
+let text = "";  
+
+groups.forEach(  
+  (group, index) => {  
+
+    const alliance =  
+      group.alliance  
+        ? `[${group.alliance}]`  
+        : "";  
+
+    text +=  
+      `◉ ${group.name} ${alliance}`;  
+
+    text += "\n";  
+
+    if (  
+      group.users.length === 0  
+    ) {  
+
+      text +=  
+        "(empty)\n";  
+
+    } else {  
+
+      text +=  
+        group.users.join(", ") + "\n";  
+
+    }  
+
+    /*  
+     * Empty line between groups  
+     */  
+
+    if (  
+      index <  
+      groups.length - 1  
+    ) {  
+
+      text += "\n";  
+
+    }  
+
+  }  
+);  
+
+navigator.clipboard  
+  .writeText(text)  
+  .then(  
+    () => {  
+      showCopyFeedback();  
+    }  
+  )  
+  .catch(  
+    () => {  
+      fallbackCopy(text);  
+    }  
   );
 
-  function copyGroups() {
-
-    let text = "";
-
-    groups.forEach(
-      (group, index) => {
-
-        const alliance =
-          group.alliance
-            ? `[${group.alliance}]`
-            : "";
-
-        text +=
-          `◉ ${group.name} ${alliance}`;
-
-        text += "\n";
-
-        if (
-          group.users.length === 0
-        ) {
-
-          text +=
-            "(empty)\n";
-
-        } else {
-
-          text +=
-            group.users.join(", ") + "\n";
-
-        }
-
-        /*
-         * Empty line between groups
-         */
-
-        if (
-          index <
-          groups.length - 1
-        ) {
-
-          text += "\n";
-
-        }
-
-      }
-    );
-
-    navigator.clipboard
-      .writeText(text)
-      .then(
-        () => {
-          showCopyFeedback();
-        }
-      )
-      .catch(
-        () => {
-          fallbackCopy(text);
-        }
-      );
-
-  }
-
-
+}
 
 /* ==========================================================
-   COPY FEEDBACK
+COPY FEEDBACK
 ========================================================== */
 
 function showCopyFeedback() {
 
-  const button =
-    document.getElementById(
-      "copyBtn"
-    );
+const button =
+document.getElementById(
+"copyBtn"
+);
+
+const original =
+button.textContent;
+
+button.textContent =
+"Copied!";
+
+button.classList.remove(
+"bg-gray-200",
+"text-gray-700"
+);
+
+button.classList.add(
+"bg-green-500",
+"text-white"
+);
+
+setTimeout(
+() => {
+
+button.textContent =  
+    original;  
 
 
-  const original =
-    button.textContent;
+  button.classList.remove(  
+    "bg-green-500",  
+    "text-white"  
+  );  
 
 
-  button.textContent =
-    "Copied!";
+  button.classList.add(  
+    "bg-gray-200",  
+    "text-gray-700"  
+  );  
 
+},  
+1200
 
-  button.classList.remove(
-    "bg-gray-200",
-    "text-gray-700"
-  );
-
-
-  button.classList.add(
-    "bg-green-500",
-    "text-white"
-  );
-
-
-  setTimeout(
-    () => {
-
-      button.textContent =
-        original;
-
-
-      button.classList.remove(
-        "bg-green-500",
-        "text-white"
-      );
-
-
-      button.classList.add(
-        "bg-gray-200",
-        "text-gray-700"
-      );
-
-    },
-    1200
-  );
+);
 
 }
 
-
-
 /* ==========================================================
-   FALLBACK COPY
+FALLBACK COPY
 ========================================================== */
 
 function fallbackCopy(
-  text
+text
 ) {
 
-  const textarea =
-    document.createElement(
-      "textarea"
-    );
+const textarea =
+document.createElement(
+"textarea"
+);
+
+textarea.value =
+text;
+
+textarea.style.position =
+"fixed";
+
+textarea.style.opacity =
+"0";
+
+document.body.appendChild(
+textarea
+);
+
+textarea.select();
+
+try {
+
+document.execCommand(  
+  "copy"  
+);  
 
 
-  textarea.value =
-    text;
+showCopyFeedback();
 
+} catch {
 
-  textarea.style.position =
-    "fixed";
-
-
-  textarea.style.opacity =
-    "0";
-
-
-  document.body.appendChild(
-    textarea
-  );
-
-
-  textarea.select();
-
-
-  try {
-
-    document.execCommand(
-      "copy"
-    );
-
-
-    showCopyFeedback();
-
-  } catch {
-
-    alert(
-      text
-    );
-
-  }
-
-
-  textarea.remove();
+alert(  
+  text  
+);
 
 }
 
+textarea.remove();
 
+}
 
 /* ==========================================================
-   RESET
+RESET
 ========================================================== */
 
 document
-  .getElementById(
-    "resetBtn"
-  )
-  .addEventListener(
-    "click",
-    resetAll
-  );
-
-
+.getElementById(
+"resetBtn"
+)
+.addEventListener(
+"click",
+resetAll
+);
 
 function resetAll() {
 
-  const allUsers = [];
+const allUsers = [];
 
-  // 모든 그룹의 유저를 Available Users로 이동
-  groups.forEach(group => {
+// 모든 그룹의 유저를 Available Users로 이동
+groups.forEach(group => {
 
-    allUsers.push(...group.users);
+allUsers.push(...group.users);  
 
-    group.users = [];
+group.users = [];
 
-  });
+});
 
-  // 기존 Available Users도 유지
-  availableUsers = [
-    ...availableUsers,
-    ...allUsers
-  ];
+// 기존 Available Users도 유지
+availableUsers = [
+...availableUsers,
+...allUsers
+];
 
-  // 중복 제거
-  availableUsers = [...new Set(availableUsers)];
+// 중복 제거
+availableUsers = [...new Set(availableUsers)];
 
-  save();
-  render();
+save();
+render();
 
 }
 
-
 /* ==========================================================
-   AVAILABLE DROP ZONE INIT
+AVAILABLE DROP ZONE INIT
 ========================================================== */
 
 setupAvailableDropZone();
 
 setupDeleteDropZone();
 
-
-
 /* ==========================================================
-   START
+START
 ========================================================== */
 
 init();
