@@ -2375,7 +2375,7 @@ document
     );
 
     navigator.clipboard
-      .writeText(text)
+      .writeText(text.trimEnd())
       .then(
         () => {
           showCopyFeedback();
