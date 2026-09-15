@@ -775,8 +775,6 @@ function mouseDragStart(e) {
   const chip =
     e.currentTarget;
 
-chip.dataset.wasDragged =
-  "true";
   
   dragState = {
 
@@ -1519,8 +1517,6 @@ function touchPointerDown(e) {
   const chip =
     e.currentTarget;
 
-  chip.dataset.wasDragged =
-  "true";
 
   const rect =
     chip.getBoundingClientRect();
