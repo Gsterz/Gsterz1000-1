@@ -2292,11 +2292,6 @@ function addNewUser(
     inGroup
   ) {
 
-    alert(
-      "This user already exists."
-    );
-
-    render();
 
     return;
 
